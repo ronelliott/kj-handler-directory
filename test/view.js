@@ -5,6 +5,7 @@ var path = require('path'),
     reflekt = require('reflekt'),
     should = require('should'),
     sinon = require('sinon'),
+    Cache = require('../cache'),
     factory = require('../view');
 
 describe('directory', function() {
@@ -49,6 +50,39 @@ describe('directory', function() {
         factory(params)(resolver, res, function(err) {
             should(err).equal(null);
             written.should.equal('.foo { background-color: #f00; }\n');
+            done();
+        });
+    });
+
+    it('should use the cache if it is enabled', function(done) {
+        var resolver = new reflekt.ObjectResolver({ params: { asset: 'static/main.css' } }),
+            written = '',
+            res = { end: sinon.spy(), headers: sinon.spy(), write: sinon.spy(function(data) {
+                written = data.toString();
+            }) },
+            cache = new Cache(),
+            params = { base: basePath, cache: cache };
+        cache.set(path.resolve(__dirname, 'static/main.css'), 'foo');
+        factory(params)(resolver, res, function(err) {
+            should(err).equal(null);
+            written.should.equal('foo');
+            done();
+        });
+    });
+
+    it('should set the data in the cache if it is enabled', function(done) {
+        var resolver = new reflekt.ObjectResolver({ params: { asset: 'static/main.css' } }),
+            written = '',
+            res = { end: sinon.spy(), headers: sinon.spy(), write: sinon.spy(function(data) {
+                written = data.toString();
+            }) },
+            cache = new Cache(),
+            params = { base: basePath, cache: cache };
+        factory(params)(resolver, res, function(err) {
+            should(err).equal(null);
+            var value = '.foo { background-color: #f00; }\n';
+            cache.get(path.resolve(__dirname, 'static/main.css')).should.equal(value);
+            written.should.equal(value);
             done();
         });
     });

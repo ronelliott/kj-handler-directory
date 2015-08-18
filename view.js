@@ -46,6 +46,7 @@ module.exports = function(params) {
 
         fs.readFile(assetPath, function(err, data) {
             if (cache && data) {
+                data = data.toString();
                 cache.set(assetPath, data);
             }
 
