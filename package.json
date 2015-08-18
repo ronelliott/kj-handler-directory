@@ -4,7 +4,6 @@
   "description": "Directory serving handler for the kj webapp framework.",
   "author": "Ron Elliott <ron@elliott.im>",
   "license": "ISC",
-  "main": "view",
   "keywords": [
     "webapp",
     "framework",
