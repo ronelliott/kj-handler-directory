@@ -2,11 +2,15 @@
 
 var path = require('path'),
     basePath = path.resolve(__dirname),
+    proxyquire = require('proxyquire'),
     reflekt = require('reflekt'),
     should = require('should'),
     sinon = require('sinon'),
     Cache = require('../cache'),
     factory = require('../view');
+
+function MockCache() {}
+MockCache.prototype = { get: sinon.spy(), has: sinon.spy(), set: sinon.spy() };
 
 describe('directory', function() {
     it('should write the file data to the response', function(done) {
@@ -83,6 +87,20 @@ describe('directory', function() {
             var value = '.foo { background-color: #f00; }\n';
             cache.get(path.resolve(__dirname, 'static/main.css')).should.equal(value);
             written.should.equal(value);
+            done();
+        });
+    });
+
+    it('should create a cache if a boolean is passed instead of a cache object', function(done) {
+        var resolver = new reflekt.ObjectResolver({ params: { asset: 'static/main.css' } }),
+            res = { end: sinon.spy(), headers: sinon.spy(), write: sinon.spy() },
+            params = { base: basePath, cache: true };
+
+        MockCache.prototype = { get: sinon.spy(), has: sinon.spy(), set: sinon.spy() };
+        var factory = proxyquire('../view', { './cache': MockCache });
+        factory(params)(resolver, res, function(err) {
+            should(err).equal(null);
+            MockCache.prototype.get.called.should.equal(true);
             done();
         });
     });
