@@ -4,7 +4,6 @@ var Cache = require('./cache'),
     fs = require('fs'),
     is = require('is'),
     mime = require('mime'),
-    objectPath = require('object-path'),
     path = require('path');
 
 module.exports = function(params) {
@@ -14,7 +13,6 @@ module.exports = function(params) {
 
     var base = path.resolve(params.base),
         cache,
-        input = params.input || 'params.asset',
         shouldSetContentType = is.defined(params.contentType) ? !!params.contentType : true;
 
     if (params.cache) {
@@ -25,14 +23,8 @@ module.exports = function(params) {
         }
     }
 
-    return function(resolver, res, finish) {
-        var inputObjName = input.split('.')[0],
-            inputObj = {};
-
-        inputObj[inputObjName] = resolver(inputObjName);
-
-        var asset = objectPath.get(inputObj, input),
-            assetPath = path.join(base, asset),
+    return function(params, res, next, finish) {
+        var assetPath = path.join(base, params.asset),
             data;
 
         if (cache) {
@@ -54,17 +46,24 @@ module.exports = function(params) {
         });
 
         function send(err, data) {
-            if (data) {
-                if (shouldSetContentType) {
-                    var contentType = is.string(params.contentType) ? params.contentType : mime.lookup(assetPath);
-                    res.headers('Content-Type', contentType);
+            if (err) {
+                if (err.code === 'ENOENT') {
+                    res.status('not found');
+                    finish();
+                    return;
                 }
 
-                res.write(data);
-                res.end();
+                next(err);
+                return;
             }
 
-            finish(err);
+            if (shouldSetContentType) {
+                var contentType = is.string(params.contentType) ? params.contentType : mime.lookup(assetPath);
+                res.header('Content-Type', contentType);
+            }
+
+            res.write(data);
+            finish();
         }
     };
 };
