@@ -17,12 +17,12 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.4",
-    "istanbul": "^0.3.17",
-    "mocha": "^2.2.5",
-    "proxyquire": "^1.6.0",
-    "reflekt": "^0.3.6",
-    "should": "^7.0.4",
-    "sinon": "^1.15.4"
+    "istanbul": "^0.3.19",
+    "mocha": "^2.3.0",
+    "proxyquire": "^1.7.1",
+    "reflekt": "^0.3.9",
+    "should": "^7.1.0",
+    "sinon": "^1.16.1"
   },
   "repository": {
     "type": "git",
