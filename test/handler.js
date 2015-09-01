@@ -7,7 +7,7 @@ var path = require('path'),
     should = require('should'),
     sinon = require('sinon'),
     Cache = require('../cache'),
-    factory = require('../view');
+    handler = require('../handler');
 
 function MockCache() {}
 MockCache.prototype = { get: sinon.spy(), has: sinon.spy(), set: sinon.spy() };
@@ -20,7 +20,7 @@ describe('directory', function() {
             }) },
             params = { base: basePath},
             next = sinon.spy();
-        factory(params)({ asset: 'static/main.css' }, res, next, function(err) {
+        handler(params)({ asset: 'static/main.css' }, res, next, function(err) {
             should(err).not.be.ok();
             written.should.equal('.foo { background-color: #f00; }\n');
             done();
@@ -31,7 +31,7 @@ describe('directory', function() {
         var res = { end: sinon.spy(), header: sinon.spy(), write: sinon.spy() },
             params = { base: basePath, contentType: true },
             next = sinon.spy();
-        factory(params)({ asset: 'static/main.css' }, res, next, function(err) {
+        handler(params)({ asset: 'static/main.css' }, res, next, function(err) {
             should(err).not.be.ok();
             res.header.calledWith('Content-Type', 'text/css').should.equal(true);
             done();
@@ -40,7 +40,7 @@ describe('directory', function() {
 
     it('should throw an error if no base path is defined', function() {
         (function() {
-            factory({});
+            handler({});
         }).should.throw('No base path defined!');
     });
 
@@ -53,7 +53,7 @@ describe('directory', function() {
             params = { base: basePath, cache: cache },
             next = sinon.spy();
         cache.set(path.resolve(__dirname, 'static/main.css'), 'foo');
-        factory(params)({ asset: 'static/main.css' }, res, next, function(err) {
+        handler(params)({ asset: 'static/main.css' }, res, next, function(err) {
             should(err).not.be.ok();
             written.should.equal('foo');
             done();
@@ -68,7 +68,7 @@ describe('directory', function() {
             cache = new Cache(),
             params = { base: basePath, cache: cache },
             next = sinon.spy();
-        factory(params)({ asset: 'static/main.css' }, res, next, function(err) {
+        handler(params)({ asset: 'static/main.css' }, res, next, function(err) {
             should(err).not.be.ok();
             var value = '.foo { background-color: #f00; }\n';
             cache.get(path.resolve(__dirname, 'static/main.css')).should.equal(value);
@@ -83,8 +83,8 @@ describe('directory', function() {
             next = sinon.spy();
 
         MockCache.prototype = { get: sinon.spy(), has: sinon.spy(), set: sinon.spy() };
-        var factory = proxyquire('../view', { './cache': MockCache });
-        factory(params)({ asset: 'static/main.css' }, res, next, function(err) {
+        var handler = proxyquire('../handler', { './cache': MockCache });
+        handler(params)({ asset: 'static/main.css' }, res, next, function(err) {
             should(err).not.be.ok();
             MockCache.prototype.get.called.should.equal(true);
             done();

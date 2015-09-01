@@ -6,25 +6,25 @@ var Cache = require('./cache'),
     mime = require('mime'),
     path = require('path');
 
-module.exports = function(params) {
-    if (!params.base) {
+module.exports = function($opts) {
+    if (!$opts.base) {
         throw new Error('No base path defined!');
     }
 
-    var base = path.resolve(params.base),
+    var base = path.resolve($opts.base),
         cache,
-        shouldSetContentType = is.defined(params.contentType) ? !!params.contentType : true;
+        shouldSetContentType = is.defined($opts.contentType) ? !!$opts.contentType : true;
 
-    if (params.cache) {
-        cache = params.cache;
+    if ($opts.cache) {
+        cache = $opts.cache;
 
         if (is.boolean(cache)) {
             cache = new Cache();
         }
     }
 
-    return function(params, res, next, finish) {
-        var assetPath = path.join(base, params.asset),
+    return function($params, $res, $next, $finish) {
+        var assetPath = path.join(base, $params.asset),
             data;
 
         if (cache) {
@@ -48,22 +48,21 @@ module.exports = function(params) {
         function send(err, data) {
             if (err) {
                 if (err.code === 'ENOENT') {
-                    res.status('not found');
-                    finish();
+                    $finish({ notFound: true });
                     return;
                 }
 
-                next(err);
+                $next(err);
                 return;
             }
 
             if (shouldSetContentType) {
-                var contentType = is.string(params.contentType) ? params.contentType : mime.lookup(assetPath);
-                res.header('Content-Type', contentType);
+                var contentType = is.string($opts.contentType) ? $opts.contentType : mime.lookup(assetPath);
+                $res.header('Content-Type', contentType);
             }
 
-            res.write(data);
-            finish();
+            $res.write(data);
+            $finish();
         }
     };
 };

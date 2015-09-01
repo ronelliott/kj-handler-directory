@@ -1,5 +1,5 @@
 'use strict';
 
-module.exports = function(resolver) {
-    resolver.add('directory', require('./view'));
+module.exports = function($$resolver) {
+    $$resolver.add('$directory', require('./handler'));
 };
