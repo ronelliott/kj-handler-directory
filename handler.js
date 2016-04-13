@@ -1,10 +1,10 @@
 'use strict';
 
-var Cache = require('./cache'),
-    fs = require('fs'),
-    is = require('is'),
-    mime = require('mime'),
-    path = require('path');
+const Cache = require('./cache'),
+      fs = require('fs'),
+      is = require('is'),
+      mime = require('mime'),
+      path = require('path');
 
 module.exports = function($opts) {
     if (!$opts.base) {
