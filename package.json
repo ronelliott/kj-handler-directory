@@ -1,6 +1,6 @@
 {
   "name": "kj-handler-directory",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Directory serving handler for the kj webapp framework.",
   "author": "Ron Elliott <ronaldbelliott@gmail.com>",
   "license": "ISC",
