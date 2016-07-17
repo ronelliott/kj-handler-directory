@@ -11,3 +11,16 @@
 Install using [NPM](https://github.com/isaacs/npm):
 
     npm install kj-handler-directory --save
+
+
+## Usage
+Add the module to the modules section of your config:
+
+    modules.exports = {
+        ...
+        modules: [
+            ...
+            require('kj-handler-directory'),
+            ...
+        ],
+    };
